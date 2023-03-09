@@ -4,14 +4,14 @@ Clear-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explor
 # Clear run history
 Clear-History -Count 1000 -ErrorAction SilentlyContinue
 
-# Clear Google Chrome history
-$ChromeHistoryPath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\History"
-if(Test-Path $ChromeHistoryPath){
-    $connectionString = "Data Source=$ChromeHistoryPath;Version=3;New=False;Compress=True;"
-    $dbConnection = New-Object System.Data.SQLite.SQLiteConnection($connectionString)
-    $dbConnection.Open()
-    $dbCommand = $dbConnection.CreateCommand()
-    $dbCommand.CommandText = "DELETE FROM urls;"
-    $dbCommand.ExecuteNonQuery()
-    $dbConnection.Close()
+# Clear Google Chrome browser history
+$ChromeProfileDir = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default"
+if(Test-Path $ChromeProfileDir){
+    $ChromeHistoryFile = Join-Path $ChromeProfileDir "History"
+    if(Test-Path $ChromeHistoryFile){
+        Remove-Item $ChromeHistoryFile -Force
+    }
 }
+
+# Clear recent file history
+Clear-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs' -Name '*' -ErrorAction SilentlyContinue
